@@ -19,7 +19,8 @@ https://www.facebook.com/v2.10/dialog/oauth?client_id=xxx&scope=email,user_birth
 Client_id dell’applicazione che richiede l’access token per l’utente che sta effettuando il login.
 Scope, una lista separata da virgole delle autorizzazioni da richiedere a chi usa l'app.
 Response type determina se i dati della risposta al reindirizzamento all'app sono parametri o frammenti di URL, nel nostro 
-caso “code”: i dati della risposta sono parametri di URL contenenti il parametro code (una stringa crittografata diversa per ogni richiesta di accesso). È utile per la gestione del token da parte del server.                                                                                                                        Redirect_uri: l'URL a cui desideri reindirizzare l'utente al momento dell'accesso, che acquisisce la risposta della finestra di dialogo Accedi.
+caso “code”: i dati della risposta sono parametri di URL contenenti il parametro code (una stringa crittografata diversa per 
+ogni richiesta di accesso). È utile per la gestione del token da parte del server.                                                                                                                        Redirect_uri: l'URL a cui desideri reindirizzare l'utente al momento dell'accesso, che acquisisce la risposta della finestra di dialogo Accedi.
 
 2) Gestione delle risposte della finestra di dialogo Accedi
 
@@ -41,8 +42,8 @@ restituisce solo l'ID, il nome, la data di nascita e l'email del profilo in ques
 Accediamo ad alcuni dati del Public_profile(predefinita), il quale fornisce l'accesso a un sottoinsieme di elementi che 
 fanno parte del profilo pubblico di un utente, tra cui il codice identificativo dell’utente con relativo nome e cognome.   
 
-Birthday: La data e il mese del compleanno di un utente. L'anno di nascita potrebbe essere incluso oppure no, a seconda delle
-impostazioni sulla privacy e del token d'accesso usato per richiedere questo campo.                                                                                                                             
+Birthday: La data e il mese del compleanno di un utente. L'anno di nascita potrebbe essere incluso oppure no, a seconda 
+delle impostazioni sulla privacy e del token d'accesso usato per richiedere questo campo.                                                                                                                             
 Email: Fornisce l'accesso all'indirizzo e-mail principale di un utente tramite la proprietà email nell'oggetto user.
 
 Il campo body delle risposte contiene un oggetto JSON con stringa codificata:
