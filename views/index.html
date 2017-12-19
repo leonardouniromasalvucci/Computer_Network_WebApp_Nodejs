@@ -1,0 +1,140 @@
+<html>
+<head><title>Chat</title>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+<script src="http://code.jquery.com/jquery-latest.min.js"></script>
+<style>
+   @import url("https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css");
+body{
+  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+.logo{
+  position: absolute;
+  width: 200px;
+  margin: -12px 0px 0px -12px;
+  padding: 0px
+}
+.headText{
+  font-family: Agenda-Light, Agenda Light, Agenda, Arial Narrow, sans-serif;
+  font-weight:100; 
+  margin: 15% auto 0 5%;
+  color: white;
+}
+.headText h1:before{
+    font-family: FontAwesome;
+    content: "\f18c";
+    color: green;
+    margin: 5px;
+}
+.headText h1:after{
+    font-family: FontAwesome;
+    content: "\f18c";
+    color: green;
+    margin: 5px;
+}
+
+#polina { 
+  font-family: Agenda-Light, Agenda Light, Agenda, Arial Narrow, sans-serif;
+  font-weight:100; 
+  background: rgba(0,0,0,0.7);
+  color: white;
+  padding: 2%;
+  width: 31%;
+  margin: 3% 5% 5% auto;
+  float: left;
+  margin-left: :40%;
+}
+.btn-facebook{
+    background-color: #3b5998;
+    color: #fff;
+}
+.btn-facebook:hover{
+    background-color: #fff;
+    color: #3b5998;
+}
+.btn-google{
+    background-color: #c23321;
+    color: #fff;
+}
+.btn-google:hover{
+    background-color: #fff;
+    color: #c23321;
+}
+
+@media screen and (max-width: 500px) { 
+  #polina{
+    width:90%;
+    margin-top: -50% !important;
+  } 
+  video{
+    display: none;
+  }
+}
+@media screen and (max-device-width: 800px) {
+  #bgvid { display: none; }
+}
+</style>
+</head>
+<body>
+<div class="container-fluid" style="margin-left:35%;margin-top: 2%;width:90%;">
+    <h3 style="margin-left: 8%;">My App Node.JS</h3>
+    <div class="container-fluid" >
+    <div class="row" >
+ 
+    <div id="polina" class="col-sm-6">
+    <h4 class="text-center">Accedi con Facebook</h4>
+    <div class="social text-center">
+    <div class="row">
+    <div class="col-sm-6">
+       <!--<a class="btn btn-block btn-social btn-facebook" href="http://172.17.0.2:3000/login">
+            <span class="fa fa-facebook"></span> Sign Up
+        </a>-->
+    <form action="/login_facebook" id="frm2" class="form-horizontal" method="GET">
+        <input type="submit" style="margin-left:65%;" id="face_form" class="btn btn-block btn-social btn-facebook" value="Accedi "/>
+    </form>
+    </div>
+    
+    </div>
+    </div>
+    
+    <div class="text-center">
+        <h5>O REGISTRATI</h5>
+    </div>
+    <form  action="/login_form" method="post" class="form-horizontal">
+    <div class="form-group has-success has-feedback">
+      <div class="col-sm-12">
+        <input type="text" class="form-control" id="name" name="name" placeholder="Nome e cognome" required>
+        <span class="glyphicon glyphicon-user form-control-feedback"></span>
+      </div>
+    </div>
+     <div class="form-group has-success has-feedback">
+      <div class="col-sm-12">
+        <input type="text" class="form-control" id="email" name="email" placeholder="Email" required>
+        <span class="glyphicon glyphicon-envelope form-control-feedback"></span>
+      </div>
+    </div>
+     <div class="form-group has-success has-feedback">
+      <div class="col-sm-12">
+        <input type="text" class="form-control" id="data" name="birthday" placeholder="Data di nascita" required>
+       <!-- <span class="glyphicon glyphicon-phone form-control-feedback"></span>-->
+      </div>
+    </div>
+     
+  <div class="text-center">
+  <!--<p class="text-center">Registrati ed accedi alla mia app </p>-->
+  <input type="submit" name="submit"  class="btn sellBtn btn-success" value="Registrati"/>
+  </div>
+  </form>
+  <br>
+   <div class="text-right">
+   <p></a></p>
+  </div>
+</div>
+</div>
+</div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Google Drive Files</title>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+    <script src="http://code.jquery.com/jquery-latest.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script> 
+<style>
+body {
+	font-family: 'Open Sans', sans-serif;
+	color: #353535;
+}
+.content h1 {
+	text-align: center;
+}
+.content .content-footer p {
+	color: #6d6d6d;
+    font-size: 12px;
+    text-align: center;
+}
+.content .content-footer p a {
+	color: inherit;
+	font-weight: bold;
+}
+
+/*	--------------------------------------------------
+	:: Table Filter
+	-------------------------------------------------- */
+.panel {
+	border: 1px solid #ddd;
+	background-color: #fcfcfc;
+}
+.panel .btn-group {
+	margin: 15px 0 30px;
+}
+.panel .btn-group .btn {
+	transition: background-color .3s ease;
+}
+.table-filter {
+	background-color: #fff;
+	border-bottom: 1px solid #eee;
+}
+.table-filter tbody tr:hover {
+	cursor: pointer;
+	background-color: #eee;
+}
+.table-filter tbody tr td {
+	vertical-align: middle;
+	border-top-color: #eee;
+}
+.table-filter tbody tr.selected td {
+	background-color: #eee;
+}
+.table-filter tr td:first-child {
+	width: 38px;
+}
+.table-filter tr td:nth-child(2) {
+	width: 35px;
+}
+.ckbox {
+	position: relative;
+}
+.ckbox input[type="checkbox"] {
+	opacity: 0;
+}
+.ckbox label {
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+.ckbox label:before {
+	content: '';
+	top: 1px;
+	left: 0;
+	width: 18px;
+	height: 18px;
+	display: block;
+	position: absolute;
+	border-radius: 2px;
+	border: 1px solid #bbb;
+	background-color: #fff;
+}
+.ckbox input[type="checkbox"]:checked + label:before {
+	border-color: #2BBCDE;
+	background-color: #2BBCDE;
+}
+.ckbox input[type="checkbox"]:checked + label:after {
+	top: 3px;
+	left: 3.5px;
+	content: '\e013';
+	color: #fff;
+	font-size: 11px;
+	font-family: 'Glyphicons Halflings';
+	position: absolute;
+}
+.table-filter .star {
+	color: #ccc;
+	text-align: center;
+	display: block;
+}
+.table-filter .star.star-checked {
+	color: #F0AD4E;
+}
+.table-filter .star:hover {
+	color: #ccc;
+}
+.table-filter .star.star-checked:hover {
+	color: #F0AD4E;
+}
+.table-filter .media-photo {
+	width: 35px;
+}
+.table-filter .media-body {
+    display: block;
+    /* Had to use this style to force the div to expand (wasn't necessary with my bootstrap version 3.3.6) */
+}
+.table-filter .media-meta {
+	font-size: 11px;
+	color: #999;
+}
+.table-filter .media .title {
+	color: #2BBCDE;
+	font-size: 14px;
+	font-weight: bold;
+	line-height: normal;
+	margin: 0;
+}
+.table-filter .media .title span {
+	font-size: .8em;
+	margin-right: 20px;
+}
+.table-filter .media .title span.pagado {
+	color: #5cb85c;
+}
+.table-filter .media .title span.pendiente {
+	color: #f0ad4e;
+}
+.table-filter .media .title span.cancelado {
+	color: #d9534f;
+}
+.table-filter .media .summary {
+	font-size: 14px;
+}
+
+/* CHAT */
+.col-md-2, .col-md-10{
+    padding:0;
+}
+.panel{
+    margin-bottom: 0px;
+}
+.chat-window{
+    bottom:0;
+    position:fixed;
+    float:right;
+    margin-left:10px;
+}
+.chat-window > div > .panel{
+    border-radius: 5px 5px 0 0;
+}
+.icon_minim{
+    padding:2px 10px;
+}
+.msg_container_base{
+  background: #e5e5e5;
+  margin: 0;
+  padding: 0 10px 10px;
+  max-height:300px;
+  overflow-x:hidden;
+}
+.top-bar {
+  background: #666;
+  color: white;
+  padding: 10px;
+  position: relative;
+  overflow: hidden;
+}
+.msg_receive{
+    padding-left:0;
+    margin-left:0;
+}
+.msg_sent{
+    padding-bottom:20px !important;
+    margin-right:0;
+}
+.messages {
+  background: white;
+  padding: 10px;
+  border-radius: 2px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  max-width:100%;
+}
+.messages > p {
+    font-size: 13px;
+    margin: 0 0 0.2rem 0;
+  }
+.messages > time {
+    font-size: 11px;
+    color: #ccc;
+}
+.msg_container {
+    padding: 10px;
+    overflow: hidden;
+    display: flex;
+}
+img {
+    display: block;
+    width: 100%;
+}
+.avatar {
+    position: relative;
+}
+.base_receive > .avatar:after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 0;
+    height: 0;
+    border: 5px solid #FFF;
+    border-left-color: rgba(0, 0, 0, 0);
+    border-bottom-color: rgba(0, 0, 0, 0);
+}
+
+.base_sent {
+  justify-content: flex-end;
+  align-items: flex-end;
+}
+.base_sent > .avatar:after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 0;
+    border: 5px solid white;
+    border-right-color: transparent;
+    border-top-color: transparent;
+    box-shadow: 1px 1px 2px rgba(black, 0.2); // not quite perfect but close
+}
+
+.msg_sent > time{
+    float: right;
+}
+
+
+
+.msg_container_base::-webkit-scrollbar-track
+{
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+    background-color: #F5F5F5;
+}
+
+.msg_container_base::-webkit-scrollbar
+{
+    width: 12px;
+    background-color: #F5F5F5;
+}
+
+.msg_container_base::-webkit-scrollbar-thumb
+{
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+    background-color: #555;
+}
+
+.btn-group.dropup{
+    position:fixed;
+    left:0px;
+    bottom:0;
+}
+/* FINE CHAT */
+	</style>
+</head>
+<body>
+<div id="b1" style="margin-left: 85%;margin-top:1%;">
+    <form  action="/logout" method="GET">
+        <input type="submit" class="btn btn-primary" style="margin-left:15%;" value="Esci"/>
+    </form>
+</div>
+<div class="container">
+	<div class="row">
+		<section class="content">
+			<h1>Condividi i tuoi file</h1>
+			
+            <div class="container bootstrap snippet" style="margin-left:45%;">
+                <div class="row">
+                    <div class="row border-bottom padding-sm" id="box2" style="height:40px;margin-left: 12px;width: 35%;"></div>
+                </div>
+            </div>
+			<div class="col-md-8 col-md-offset-2" style="margin-top:3%;margin-left: 25%;" id="box3">
+				<!-- inizio -->
+				<!--<div class="panel panel-default" style="height:50%;">
+					<div class="panel-body">
+						<div class="table-container">
+							<table class="table table-filter" >
+								<tbody >
+									<tr data-status="pagado">
+										
+											<div class="media">
+												<a href="#" class="pull-left" >
+													<img src="https://s3.amazonaws.com/uifaces/faces/twitter/fffabs/128.jpg" class="media-photo">
+												</a>
+												<div class="media-body">
+													<span class="media-meta pull-right">Febrero 13, 2016</span>
+													<h4 class="title">
+														Lorem Impsum
+													
+													</h4>
+												
+												</div>
+													
+											</div>
+												<a href="#" style="margin-left:75%;float:left;" class="btn btn-success" role="button">Download</a>
+												<a href="#" style="margin-left:2%;" class="btn btn-danger" role="button">Elimina</a>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>-->
+                <!-- fine -->
+
+				
+			</div>
+			<!-- <div class="content-footer" style="margin-left: 20px; position: fixed; z-index: 2147483647; display:block;">
+					<p>
+						RC_PROJECT - 2017 <br>
+						Realizzato da <a href="#" target="_blank">Salvucci Leonardo</a>
+					</p>
+			</div>-->
+            <div class="content-footer" id="scrol" style="margin-left: 85%;margin-top:20%; position: fixed; z-index: 2147483647; display:block;">
+            <img src="http://www.gtk.uni-pannon.hu/wp-content/themes/gtk2017/img/scrolltop.png" style="width:60px; height:60px;"/>
+            </div>
+
+		</section>
+   </div>
+</div>
+<div class="row chat-window col-xs-5 col-md-3" id="chat_window_1" style="margin-left:10px;">
+        <div class="col-xs-12 col-md-12">
+        	<div class="panel panel-default">
+                <div class="panel-heading top-bar">
+                    <div class="col-md-8 col-xs-8">
+                        <h3 class="panel-title"><span class="glyphicon glyphicon-comment"></span> Chat - Socket</h3>
+                    </div>
+                    <div class="col-md-4 col-xs-4" style="text-align: right;">
+                        <a href="#"><span id="minim_chat_window" class="glyphicon glyphicon-minus icon_minim"></span></a>
+                        <a href="#"><span class="glyphicon glyphicon-remove icon_close" data-id="chat_window_1"></span></a>
+                    </div>
+                </div>
+                <div class="panel-body msg_container_base" id="bo3">
+                   <!-- <div class="row msg_container base_sent">
+                        <div class="col-md-10 col-xs-10">
+                            <div class="messages msg_sent">
+                                <p>that mongodb thing looks good, huh?
+                                tiny master db, and huge document store</p>
+                                <time datetime="2009-11-13T20:00">Timothy • 51 min</time>
+                            </div>
+                        </div>
+                        <div class="col-md-2 col-xs-2 avatar">
+                            <img src="http://www.bitrebels.com/wp-content/uploads/2011/02/Original-Facebook-Geek-Profile-Avatar-1.jpg" class=" img-responsive ">
+                        </div>
+                    </div>-->
+                   <!-- <div class="row msg_container base_receive">
+                        <div class="col-md-2 col-xs-2 avatar">
+                            <img src="http://www.bitrebels.com/wp-content/uploads/2011/02/Original-Facebook-Geek-Profile-Avatar-1.jpg" class=" img-responsive ">
+                        </div>
+                        <div class="col-md-10 col-xs-10">
+                            <div class="messages msg_receive">
+                                <p>that mongodb thing looks good, huh?
+                                tiny master db, and huge document store</p>
+                                <time datetime="2009-11-13T20:00">Timothy • 51 min</time>
+                            </div>
+                        </div>
+                    </div>-->
+                  
+                   
+                
+    		</div>
+    		<div class="panel-footer">
+                    <!--<div class="input-group">-->
+                    	<form id="formChat" class="input-group">
+                          <input id="btn-input" type="text" class="form-control input-sm chat_input" placeholder="Scrivi il messaggio..." />
+                          <span class="input-group-btn">
+                            <button class="btn btn-primary btn-sm" type="submit" id="btn-chat">Invia</button>
+                          </span>
+                        </form>
+                  <!--  </div>-->
+                </div>
+        </div>
+    </div>
+    
+ <!--  <div class="btn-group dropup">
+        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+            <span class="glyphicon glyphicon-cog"></span>
+            <span class="sr-only">Toggle Dropdown</span>
+        </button>
+        <ul class="dropdown-menu" role="menu">
+            <li><a href="#" id="new_chat"><span class="glyphicon glyphicon-plus"></span> Novo</a></li>
+            <li><a href="#"><span class="glyphicon glyphicon-list"></span> Ver outras</a></li>
+            <li><a href="#"><span class="glyphicon glyphicon-remove"></span> Fechar Tudo</a></li>
+            <li class="divider"></li>
+            <li><a href="#"><span class="glyphicon glyphicon-eye-close"></span> Invisivel</a></li>
+        </ul>
+    </div>-->
+
+    <script>
+    var token = "<%= token %>";
+        $.ajax({
+            url: 'https://www.googleapis.com/drive/v3/files?pageSize=15&access_token='+token,
+            type: "GET",
+            dataType: 'json',
+            success: function(responseBody) {
+                var arr = responseBody.files;
+                var html='';
+                arr.forEach(function(Arrayitem){
+                html += 
+                '<div class="panel panel-default" style="height:50%;">'+
+                    '<div class="panel-body">'+
+                        '<div class="table-container">'+
+                            '<table class="table table-filter" >'+
+                                '<tbody >'+
+                                    '<tr data-status="pagado">'+
+                                        '<div class="media">'+
+                                            
+                                            '<div class="media-body">'+
+                                                '<span class="media-meta pull-right">Type file: '+Arrayitem.mimeType+'</span>'+
+                                                '<h4 class="title">'+Arrayitem.name+'</h4>'+
+                                            '</div>'+
+                                        '</div>'+
+                                        '<a href="https://drive.google.com/uc?id='+Arrayitem.id+'&export=download" style="margin-left:85%;float:left;" target="_blank" class="btn btn-success" role="button">Download</a>'+
+                                    '</tr>'+
+                                '</tbody>'+
+                            '</table>'+
+                        '</div>'+
+                    '</div>'+
+                '</div>';
+                $('#box3').html(html);
+                });
+            },
+            error: function(responseBody) {
+                alert("ERRORE INASPETTATO O ACCESS TOKEN SCADUTO!!! ");
+                window.location.href = "/login_facebook";
+            }
+        }); 
+    </script>
+    <script>
+        $("#scrol").hide();
+    	
+    	$(document).on('click', '.panel-heading span.icon_minim', function (e) {
+    var $this = $(this);
+    if (!$this.hasClass('panel-collapsed')) {
+        $this.parents('.panel').find('.panel-body').slideUp();
+        $this.addClass('panel-collapsed');
+        $this.removeClass('glyphicon-minus').addClass('glyphicon-plus');
+    } else {
+        $this.parents('.panel').find('.panel-body').slideDown();
+        $this.removeClass('panel-collapsed');
+        $this.removeClass('glyphicon-plus').addClass('glyphicon-minus');
+    }
+});
+$(document).on('focus', '.panel-footer input.chat_input', function (e) {
+    var $this = $(this);
+    if ($('#minim_chat_window').hasClass('panel-collapsed')) {
+        $this.parents('.panel').find('.panel-body').slideDown();
+        $('#minim_chat_window').removeClass('panel-collapsed');
+        $('#minim_chat_window').removeClass('glyphicon-plus').addClass('glyphicon-minus');
+    }
+});
+$(document).on('click', '#new_chat', function (e) {
+    var size = $( ".chat-window:last-child" ).css("margin-left");
+     size_total = parseInt(size) + 400;
+    alert(size_total);
+    var clone = $( "#chat_window_1" ).clone().appendTo( ".container" );
+    clone.css("margin-left", size_total);
+});
+$(document).on('click', '.icon_close', function (e) {
+    //$(this).parent().parent().parent().parent().remove();
+    $( "#chat_window_1" ).remove();
+});
+
+</script>
+
+<script>
+	$(function(){
+      	var socket = io.connect();
+        socket.on('get users', function (data) { 
+            var html;
+            if(data == 1){
+               html = '<p style="color:#337ab7"><i class="glyphicon glyphicon-user" style="margin-left:3px;"></i>&nbsp;'+data+' utente online</p>';
+            }else{
+               html = '<p style="color:#337ab7"><i class="glyphicon glyphicon-user" style="margin-left:3px;"></i>&nbsp;'+data+' utenti online</p>';
+            }
+            $('#box2').html(html);
+        });
+        socket.on('disconnect users', function (data) { 
+            var html;
+            if(data == 1){
+               html = '<p style="color:#337ab7"><i class="glyphicon glyphicon-user"></i>&nbsp;'+data+' utente online</p>';
+            }else{
+               html = '<p style="color:#337ab7"><i class="glyphicon glyphicon-user"></i>&nbsp;'+data+' utenti online</p>';
+               
+            }
+            $('#box2').html(html);
+        });
+        var array = [];
+        socket.on('writeMessageM', function (data) { 
+        	array.push(data);
+            var html="";
+            array.forEach(function(Arrayitem){
+                html += '<div class="row msg_container base_sent">'+
+                        '<div class="col-md-10 col-xs-10">'+
+                            '<div class="messages msg_sent">'+
+                                '<p>'+Arrayitem+'</p>'+
+                                
+                            '</div>'+
+                        '</div>'+
+                        '<div class="col-md-2 col-xs-2 avatar">'+
+                            '<img src="http://www.bitrebels.com/wp-content/uploads/2011/02/Original-Facebook-Geek-Profile-Avatar-1.jpg" class=" img-responsive ">'+
+                        '</div>'+
+                    '</div>';
+            });
+            $('#bo3').html(html);
+        });
+        var array1 = [];
+        socket.on('writeMessageB', function (data) { 
+            array1.push(data);
+            var html="";
+            array1.forEach(function(Arrayitem){
+                html += '<div class="row msg_container base_receive">'+
+                        '<div class="col-md-2 col-xs-2 avatar">'+
+                            '<img src="http://www.bitrebels.com/wp-content/uploads/2011/02/Original-Facebook-Geek-Profile-Avatar-1.jpg" class=" img-responsive ">'+
+                        '</div>'+
+                        '<div class="col-md-10 col-xs-10">'+
+                            '<div class="messages msg_receive">'+
+                                '<p>'+Arrayitem+'</p>'+
+                                
+                            '</div>'+
+                        '</div>'+
+                    '</div>';
+            });
+            $('#bo3').html(html);
+        });
+        
+        var $messageForm = $('#formChat');
+        var $message = $('#btn-input');
+
+        $messageForm.submit(function(e){
+           e.preventDefault();
+           socket.emit('messageChat', $message.val());
+           $message.val('');
+        });
+
+
+    });
+    </script>
+    <script type="text/javascript">
+    $(window).scroll(function() {
+      if($(this).scrollTop()<=300) {
+        $("#scrol").hide();
+      }else {
+       $("#scrol").fadeIn("slow");
+      }
+    }); 
+    $("#scrol").click(function (){
+        $('html, body').animate({
+             scrollTop: $("#b1").offset().top
+        }, 800);
+    });
+    </script>
+</body>
+</html>
