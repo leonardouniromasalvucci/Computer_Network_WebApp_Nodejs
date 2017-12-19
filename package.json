@@ -1,0 +1,18 @@
+
+{
+  "name": "RC_PROJECT_2017",
+  "version": "1.0.0",
+  "main": "server.js",
+  "dependencies": {
+    "body-parser": "^1.16.1",
+    "ejs": "^2.5.5",
+    "express": "^4.14.1",
+    "express-session": "^1.15.1",
+    "request": "*",
+    "http": "*",
+    "socket.io": "*",
+    "amqplib":"*",
+    "couch-db":"*",
+    "fs":"*"
+  }
+}
