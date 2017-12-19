@@ -1,6 +1,6 @@
 FACEBOOK API  
                                                                                                                                                                    
-Quando un utente si connette a un'applicazione ed effettua il login tramite Facebook, l'applicazione ottiene un token 
+Quando un utente si connette ad un'applicazione ed effettua il login tramite Facebook, l'applicazione ottiene un token 
 d'accesso che consente un accesso temporaneo e sicuro alle API di Facebook, ovvero, permette all’applicazione di accedere 
 temporaneamente ai dati di quello specifico utente.
 Un token d'accesso è una stringa che identifica un utente, un'app o una Pagina e può essere usata dall'applicazione per le 
