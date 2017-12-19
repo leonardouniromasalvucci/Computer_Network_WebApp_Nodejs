@@ -1,1 +1,76 @@
+FACEBOOK API  
+                                                                                                                                                                   
+Quando un utente si connette a un'applicazione ed effettua il login tramite Facebook, l'applicazione ottiene un token d'accesso che consente un accesso temporaneo e sicuro alle API di Facebook, ovvero, permette all’applicazione di accedere temporaneamente ai dati di quello specifico utente.
+Un token d'accesso è una stringa che identifica un utente, un'app o una Pagina e può essere usata dall'applicazione per le chiamate API Graph, includendo anche informazioni sulla sua scadenza e sull' app che lo ha generato. 
+Come accennato, le chiamate all’ API Graph richiedono l’autorizzazione preventiva dell’utente per accedere ai suoi dati personali, accettati da quest’ultimo durante il login, evidenziando lo scopo (scopes) di quel token, nient’altro che una dichiarazione di quali informazioni si vuole far manipolare all’applicazione.
+Senza dilungarci oltre vediamo nel dettaglio le api richiamate nella mia applicazione:
+
+1) Chiamata della finestra di dialogo “Accedi” e impostazione dell'URL di reindirizzamento   
+                                                                                                   
+Per mostrare la finestra di dialogo Accedi, l'applicazione deve eseguire un reindirizzamento ad un endpoint:
+
+https://www.facebook.com/v2.10/dialog/oauth?client_id=xxx&scope=email,user_birthday&response_type=code&redirect_uri=http://172.17.0.2:3000/accedi_fb
+
+Client_id dell’applicazione che richiede l’access token per l’utente che sta effettuando il login.
+Scope, una lista separata da virgole delle autorizzazioni da richiedere a chi usa l'app.
+Response type determina se i dati della risposta al reindirizzamento all'app sono parametri o frammenti di URL, nel nostro caso “code”: i dati della risposta sono parametri di URL contenenti il parametro code (una stringa crittografata diversa per ogni richiesta di accesso). È utile per la gestione del token da parte del server.                                                                                                                        Redirect_uri: l'URL a cui desideri reindirizzare l'utente al momento dell'accesso, che acquisisce la risposta della finestra di dialogo Accedi.
+
+2) Gestione delle risposte della finestra di dialogo Accedi
+
+A questo punto del flusso di accesso, l'utente visualizzerà la finestra di dialogo Accedi e potrà scegliere se concedere o meno all'app l'accesso ai dati. Scegliendo Ok nella finestra di dialogo Accedi, concederà l'accesso al profilo pubblico e a tutte le autorizzazioni richieste dall'app. In ogni caso, il browser tornerà all'applicazione, che riceverà dati che indicano se l'utente ha annullato o ha effettuato l'accesso, in caso positivo verrà aggiunto al redirect il codice richiesto per ricevere l’access token. Come accennato, una volta acquisito il codice, l’applicazione effettua una nuova chiamata ad un altro server per ricevere l’access token dell’utente inserendo il codice e altri dati che possiamo vedere dal sorgente.
+
+3) Accesso alle informazioni dell'utente, una volta ottenuto il token
+
+Successivamente effettuiamo una nuova richiesta, ad esempio, la chiamata all'API Graph seguente che usa il token d'accesso per l'utente: 
+
+https://graph.facebook.com/me?fields=id,name,birthday,email&access_token=xxx
+
+restituisce solo l'ID, il nome, la data di nascita e l'email del profilo in questione.
+Accediamo ad alcuni dati del Public_profile(predefinita), il quale fornisce l'accesso a un sottoinsieme di elementi che fanno parte del profilo pubblico di un utente, tra cui il codice identificativo dell’utente con relativo nome e cognome.                                                                          
+Birthday: La data e il mese del compleanno di un utente. L'anno di nascita potrebbe essere incluso oppure no, a seconda delle impostazioni sulla privacy e del token d'accesso usato per richiedere questo campo.                                                                                                                             
+Email: Fornisce l'accesso all'indirizzo e-mail principale di un utente tramite la proprietà email nell'oggetto user.
+
+Il campo body delle risposte contiene un oggetto JSON con stringa codificata:
+{ id: '2011025755785076',  name: 'Leonardo Salvucci',  birthday: '02/12/1994',  email: 'leonardosalvucci@yahoo.it' }
+
+
+DRIVE API
+
+Il processo principale è analogo a quello trattato per Facebook, svolgendo l'autenticazione step by step, riassumendo:
+La sequenza di autorizzazione inizia quando l'applicazione reindirizza un browser a un URL di Google; l'URL include parametri di query che indicano il tipo di accesso richiesto. Google gestisce l'autenticazione dell'utente, la selezione della sessione e il consenso dell'utente. Il risultato è un codice di autorizzazione, che l'applicazione può scambiare per un token di accesso e un token di aggiornamento.
+
+L'applicazione deve memorizzare il token di aggiornamento per uso futuro e utilizzare il token di accesso per accedere a un'API di Google. Una volta scaduto il token di accesso, l'applicazione utilizza il token di aggiornamento per ottenerne uno nuovo.
+
+1) Effettuo una chiamata per accedere alla finestra di dialogo per far effettuare il login all’utente ed eventualmente accettare di cedere le proprie informazioni, specificate dallo scope, all’applicazione che effettua la chiamata, la quale è caratterizzata da un codice identificativo:
+
+https://accounts.google.com/o/oauth2/auth?client_id=xxx&response_type=code&redirect_uri=xxx&scope=https://www.googleapis.com/auth/drive
+
+Client_id dell’applicazione che richiede l’access token per l’utente che sta effettuando il login.
+Scope, autorizzazione da richiedere a chi usa l'app, specificando di volere accedere al google drive dell’utente.  
+Response type determina i dati della risposta al reindirizzamento all'app.                                     
+Redirect_uri: l'URL a cui desideri reindirizzare l'utente al momento dell'accesso, che acquisisce la risposta della finestra di dialogo Accedi.
+
+2) Gestione delle risposte della finestra di dialogo Accedi
+
+Ricevo dalla redirect i dati dell'operazione, se andata a buon fine(l'utente ha accettato le condizioni)
+
+https://www.googleapis.com:443/oauth2/v4/tokenc?ode=code&client_id=xxx&client_secret=xxx&redirect_uri=redirect_url&grant_type=authorization_code
+
+3) Accesso alle informazioni dell'utente, una volta ottenuto il token
+
+Ricevuto l’access token si può procedere alla richiesta delle informazione dell’utente in questione:
+
+https://www.googleapis.com/drive/v2/files?maxResults=15&access_token=xxx
+
+In questo caso accediamo ai file dell’utente limitando, per praticità di gestione, il numero di file nella richiesta(in questo caso 15), usando l’API v3, la quale a differenza della v2, di deafault prevede la restituzione di molti meno informazioni (nel mio caso inutili), a vantaggio di una risposta più leggera.
+
+Ho scelto proprio l'API v2 perchè mi permetteva di gestire più informazioni (icona del file, link al download, ultima modifica...)
+Anche a questa richiesta corrisponde, in caso di esito positivo, una risposta con vari oggetti JSON con cui possiamo lavorare, estrapolando dati in base alle nostre esigenze.
+Vediamo un esempio:
+
+OAUTH
+
+OAuth, è un protocollo di comunicazione aperto mediante il quale un’applicazione (o un servizio web) può gestire in modo sicuro l’accesso autorizzato ai dati sensibili.
+
+A differenza del protocollo Client/Server, il protocollo OAuth, come abbiamo potuto notare, non obbliga l’utente a fornire le credenziali di accesso al provider (il sistema esterno). L’utente viene rediretto sul server del Service Provider per l’autenticazione al sistema.
 
