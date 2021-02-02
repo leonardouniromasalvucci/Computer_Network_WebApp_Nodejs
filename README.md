@@ -1,6 +1,6 @@
 # Progetto reti di calcolatori 2017
 
-The in project was developed in [nodejs](https://nodejs.org/it/) and aims to show how a system can use the API of the most well-known systems using [Oauth](https://en.wikipedia.org/wiki/OAuth).
+The in project was developed in [Node.js](https://nodejs.org/it/) and aims to show how a system can use the API of the most well-known systems using [Oauth](https://en.wikipedia.org/wiki/OAuth).
 
 ### Oauth
 
