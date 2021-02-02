@@ -56,7 +56,7 @@ of the privacy settings and the access token used to request this field.
 Email: Provides access to a user's primary email address via the email property in the user object.
 
 The body field of the responses contains a JSON object with an encoded string:
-{id: '2011025755785076', name: 'Leonardo Salvucci', birthday: '02 / 12/1994 ', email:' leonardosalvucci@yahoo.it '}
+{id: '2011025755785076', name: 'Mario Rossi', birthday: '16/02/1994', email:'mario.rossi@gmail.com'}
 
 
 ### Google Drive API
